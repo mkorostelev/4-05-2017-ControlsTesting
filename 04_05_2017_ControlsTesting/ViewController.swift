@@ -10,6 +10,14 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    var stylesValues: StylesValues = StylesValues()
+    
+    var lightSmallTheme: StylesValues?
+    
+    var neutralTheme: StylesValues?
+    
+    var darkLargeTheme: StylesValues?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -18,6 +26,20 @@ class ViewController: UIViewController {
         changeSliderValue()
         
         changeStepperValue()
+        
+        lightSmallTheme = stylesValues.lightSmallTheme
+        
+        neutralTheme = stylesValues.neutralTheme
+        
+        darkLargeTheme = stylesValues.darkLargeTheme
+        
+        lightSmallTheme?.controlsForChanging = StylesValues.ControlsForChanging.buttons([buttonUpDownOutlet])
+        
+        neutralTheme?.controlsForChanging = StylesValues.ControlsForChanging.buttonsAndLabels(buttons: [buttonUpDownOutlet], labels: [labelUpDown, switchLabel, slideLabel, currentStyleNameLabel])
+        
+        darkLargeTheme?.controlsForChanging = StylesValues.ControlsForChanging.buttonsAndLabels(buttons: [buttonUpDownOutlet], labels: [labelUpDown, switchLabel, slideLabel, currentStyleNameLabel])
+            
+        themeOnChanged()
     }
 
     override func didReceiveMemoryWarning() {
@@ -27,6 +49,7 @@ class ViewController: UIViewController {
 
     // 1
     
+    @IBOutlet weak var buttonUpDownOutlet: UIButton!
     @IBOutlet weak var labelUpDown: UILabel!
 
     @IBAction func myFirstButtonTouchDown(_ sender: UIButton) {
@@ -83,7 +106,64 @@ class ViewController: UIViewController {
         stepperLabel.text = String(stepperOutlet.value)
     }
     
-//    var myStack = Queue()
+
+    
+    @IBOutlet weak var currentStyleNameLabel: UILabel!
+    @IBOutlet weak var segmentedControlOutlet: UISegmentedControl!
+    @IBAction func semmentedControl(_ sender: UISegmentedControl) {
+        themeOnChanged()
+    }
+    
+    func themeOnChanged(){
+        let currentTheme: StylesValues?
+        
+        switch segmentedControlOutlet.selectedSegmentIndex {
+        case 0:
+            currentTheme = lightSmallTheme
+        case 1:
+            currentTheme = darkLargeTheme
+        default:
+            currentTheme = neutralTheme
+        }
+        if let theme = currentTheme{
+            if !theme.defaultTheme{
+                // set defaults for all controls
+                setTheme(neutralTheme!)
+            }
+            // set new theme
+            setTheme(theme)
+        }
+    }
+    
+    func setTheme(_ theme: StylesValues){
+        currentStyleNameLabel.text = segmentedControlOutlet.titleForSegment(at: segmentedControlOutlet.selectedSegmentIndex)
+        
+        let (buttons, labels) = (theme.controlsForChanging.controlsSet)
+        
+        let (borderColor, backgroundColor, backgroundButtonsColor, textColor) = (theme.themeColorSet.values)
+        
+        self.view.backgroundColor = backgroundColor
+        
+        switchImage.image = theme.image
+        
+        for button in buttons {
+            button.layer.borderWidth = (theme.borderWidth.rawValue)
+            button.setTitleColor(textColor, for: .normal)
+            button.layer.borderColor = borderColor
+            button.backgroundColor = backgroundButtonsColor
+            button.layer.cornerRadius = theme.cornerRadius.rawValue
+            button.layer.borderWidth = theme.borderWidth.rawValue
+            button.setTitleColor(textColor, for: .normal)
+            button.titleLabel?.font = UIFont.boldSystemFont(ofSize: (theme.fontSize.rawValue))
+            button.titleLabel?.isHighlighted = true
+        }
+        
+        for label in labels {
+            label.font = UIFont.boldSystemFont(ofSize: (theme.fontSize.rawValue))
+            label.textColor = textColor
+            label.backgroundColor = backgroundButtonsColor
+        }
+    }
 }
 
 
