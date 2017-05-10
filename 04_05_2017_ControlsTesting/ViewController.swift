@@ -33,7 +33,7 @@ class ViewController: UIViewController {
         
         darkLargeTheme = stylesValues.darkLargeTheme
         
-        lightSmallTheme?.controlsForChanging = StylesValues.ControlsForChanging.buttons([buttonUpDownOutlet])
+        lightSmallTheme?.controlsForChanging = StylesValues.ControlsForChanging.buttonsAndLabels(buttons: [buttonUpDownOutlet], labels: [labelUpDown, switchLabel, slideLabel, currentStyleNameLabel])
         
         neutralTheme?.controlsForChanging = StylesValues.ControlsForChanging.buttonsAndLabels(buttons: [buttonUpDownOutlet], labels: [labelUpDown, switchLabel, slideLabel, currentStyleNameLabel])
         
@@ -140,28 +140,16 @@ class ViewController: UIViewController {
         
         let (buttons, labels) = (theme.controlsForChanging.controlsSet)
         
-        let (borderColor, backgroundColor, backgroundButtonsColor, textColor) = (theme.themeColorSet.values)
-        
-        self.view.backgroundColor = backgroundColor
+        self.view.backgroundColor = theme.viewBackgoundColor.value
         
         switchImage.image = theme.image
         
         for button in buttons {
-            button.layer.borderWidth = (theme.borderWidth.rawValue)
-            button.setTitleColor(textColor, for: .normal)
-            button.layer.borderColor = borderColor
-            button.backgroundColor = backgroundButtonsColor
-            button.layer.cornerRadius = theme.cornerRadius.rawValue
-            button.layer.borderWidth = theme.borderWidth.rawValue
-            button.setTitleColor(textColor, for: .normal)
-            button.titleLabel?.font = UIFont.boldSystemFont(ofSize: (theme.fontSize.rawValue))
-            button.titleLabel?.isHighlighted = true
+            button.setButtonFromStyle(buttonStyle: theme.buttonsStyle)
         }
         
         for label in labels {
-            label.font = UIFont.boldSystemFont(ofSize: (theme.fontSize.rawValue))
-            label.textColor = textColor
-            label.backgroundColor = backgroundButtonsColor
+            label.setLabelFromStyle(labelStyle: theme.labelsStyle)
         }
     }
 }

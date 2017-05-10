@@ -23,12 +23,49 @@ struct StylesValues {
         case thick = 2.5
     }
     
-    enum CornersRadiuses: CGFloat{
-        case rectangle = 0
-        case rounded = 20
-        case circle = 45
+    enum BackgroungsColors{
+        case lightThemeColor
+        case neutralThemeColor
+        case darkThemeColor
+        
+        var value: UIColor{
+            switch self {
+            case .lightThemeColor: return .lightGray
+            case .darkThemeColor: return .darkGray
+            case .neutralThemeColor: return .white
+            }
+        }
     }
-
+    
+    enum TextsColors{
+        case lightThemeColor
+        case neutralThemeColor
+        case darkThemeColor
+        
+        var value: UIColor{
+            switch self {
+            case .lightThemeColor, .darkThemeColor: return .blue
+            case .neutralThemeColor: return .black
+            }
+        }
+    }
+    
+    enum ButtonsStyles{
+        case circleButton(diameter: CGFloat, borderWidth: BordersWidths, fontSize: FontsSizes, backgroundColor: BackgroungsColors, textColor: TextsColors)
+        case rectangleButton(height: CGFloat, width: CGFloat, borderWidth: BordersWidths, fontSize: FontsSizes, backgroundColor: BackgroungsColors, textColor: TextsColors)
+        case roundedButton(height: CGFloat, width: CGFloat, borderWidth: BordersWidths, fontSize: FontsSizes, backgroundColor: BackgroungsColors, textColor: TextsColors, cornerRadius: CGFloat)
+        
+        var values: (height: CGFloat, wihth: CGFloat, borderWidth: CGFloat, fontSize: CGFloat, backgroundColor: UIColor, textColor: UIColor, cornerRadius: CGFloat){
+            switch self {
+            case let .circleButton(tuple): return (height: tuple.diameter, wihth: tuple.diameter, borderWidth: tuple.borderWidth.rawValue, fontSize: tuple.fontSize.rawValue, backgroundColor: tuple.backgroundColor.value, textColor: tuple.textColor.value, cornerRadius: CGFloat(tuple.diameter / 2))
+            
+            case let .rectangleButton(tuple): return (height: tuple.height, wihth: tuple.width, borderWidth: tuple.borderWidth.rawValue, fontSize: tuple.fontSize.rawValue, backgroundColor: tuple.backgroundColor.value, textColor: tuple.textColor.value, cornerRadius: CGFloat(0))
+            
+            case let .roundedButton(tuple): return (height: tuple.height, wihth: tuple.width, borderWidth: tuple.borderWidth.rawValue, fontSize: tuple.fontSize.rawValue, backgroundColor: tuple.backgroundColor.value, textColor: tuple.textColor.value, cornerRadius: tuple.cornerRadius)
+            }
+        }
+    }
+    
     enum ThemesColorsSets {
         case lightThemeColorsSet
         case standartThemeColorsSet
@@ -62,56 +99,121 @@ struct StylesValues {
         }
     }
     
-    let fontSize: FontsSizes
+    struct StandartStylesItems{
+        func getLightRectangleButtonStyle() -> ButtonsStyles {
+            return .rectangleButton(height: 30, width: 90, borderWidth: .thin, fontSize: .small, backgroundColor: .lightThemeColor, textColor: .lightThemeColor)
+        }
+        
+        func getNeutralCircleButtonStyle() -> ButtonsStyles {
+            return .circleButton(diameter: 90, borderWidth: .thick, fontSize: .medium, backgroundColor: .neutralThemeColor, textColor: .neutralThemeColor)
+        }
+        
+        func getDarkRoundedButtonStyle() -> ButtonsStyles {
+            return .roundedButton(height: 30, width: 90, borderWidth: .thick, fontSize: .large, backgroundColor: .darkThemeColor, textColor: .darkThemeColor, cornerRadius: 20)
+        }
+        
+        func getNeutralLabelsStyle() -> LabelsStyles {
+            return LabelsStyles(textColor: .neutralThemeColor, fontSize: .small, backgroundColor: .neutralThemeColor)
+        }
+        
+        func getLightLabelsStyle() -> LabelsStyles {
+            return LabelsStyles(textColor: .lightThemeColor, fontSize: .medium, backgroundColor: .lightThemeColor)
+        }
+        
+        func getDarkLabelsStyle() -> LabelsStyles {
+            return LabelsStyles(textColor: .darkThemeColor, fontSize: .large, backgroundColor: .darkThemeColor)
+        }
+    }
     
-    let borderWidth: BordersWidths
-    
-    let themeColorSet: ThemesColorsSets
+    struct LabelsStyles{
+        let textColor: TextsColors
+        let fontSize: FontsSizes
+        let backgroundColor: BackgroungsColors
+    }
     
     var defaultTheme: Bool
-    
-    let cornerRadius: CornersRadiuses
     
     var controlsForChanging: ControlsForChanging
     
     var image:UIImage
     
-    var lightSmallTheme: StylesValues{
-        return StylesValues(fontSize: .small, borderWidth: .thin, themeColorSet: .lightThemeColorsSet, defaultTheme: false, image: #imageLiteral(resourceName: "swiftImage2"), cornerRadius: .rounded)
-    }
+    var buttonsStyle: ButtonsStyles
+    
+    var labelsStyle: LabelsStyles
+    
+    var viewBackgoundColor: BackgroungsColors
+    
+    let standartStylesItems = StandartStylesItems()
     
     var neutralTheme: StylesValues{
-        return StylesValues(fontSize: .medium, borderWidth: .medium, themeColorSet: .standartThemeColorsSet, defaultTheme: true, image: #imageLiteral(resourceName: "swiftImage"), cornerRadius: .rectangle)
+        return StylesValues(defaultTheme: true, image: #imageLiteral(resourceName: "swiftImage3"), buttonsStyle: standartStylesItems.getNeutralCircleButtonStyle(), labelsStyle: standartStylesItems.getNeutralLabelsStyle(), viewBackgoundColor: BackgroungsColors.neutralThemeColor)
+    }
+    
+    var lightSmallTheme: StylesValues{
+        return StylesValues(defaultTheme: false, image: #imageLiteral(resourceName: "swiftImage2"), buttonsStyle: standartStylesItems.getLightRectangleButtonStyle(), labelsStyle: standartStylesItems.getLightLabelsStyle(), viewBackgoundColor: BackgroungsColors.lightThemeColor)
     }
     
     var darkLargeTheme: StylesValues{
-        return StylesValues(fontSize: .large, borderWidth: .thick, themeColorSet: .darkThemeColorsSet, defaultTheme: false, image: #imageLiteral(resourceName: "swiftImage3"), cornerRadius: .circle)
+        return StylesValues(defaultTheme: false, image: #imageLiteral(resourceName: "swiftImage"), buttonsStyle: standartStylesItems.getDarkRoundedButtonStyle(), labelsStyle: standartStylesItems.getDarkLabelsStyle(), viewBackgoundColor: BackgroungsColors.darkThemeColor)
     }
     
     init() {
-        self.borderWidth = .thin
-        self.fontSize = .small
-        self.themeColorSet = .lightThemeColorsSet
         self.controlsForChanging = .buttons([UIButton]())
+        
         self.defaultTheme = false
-        self.image = #imageLiteral(resourceName: "swiftImage")
-        self.cornerRadius = .rectangle
+        
+        self.image = #imageLiteral(resourceName: "swiftImage3")
+        
+        let standartStylesItems = StandartStylesItems()
+        
+        self.buttonsStyle = standartStylesItems.getNeutralCircleButtonStyle()
+        
+        self.labelsStyle = standartStylesItems.getNeutralLabelsStyle()
+        
+        self.viewBackgoundColor = .neutralThemeColor
     }
     
-    init(fontSize: FontsSizes, borderWidth: BordersWidths, themeColorSet: ThemesColorsSets, defaultTheme: Bool, image: UIImage, cornerRadius: CornersRadiuses) {
-        self.borderWidth = borderWidth
-        self.fontSize = fontSize
-        self.themeColorSet = themeColorSet
+    init(defaultTheme: Bool, image: UIImage, buttonsStyle: ButtonsStyles, labelsStyle: LabelsStyles, viewBackgoundColor: BackgroungsColors) {
+        
         self.controlsForChanging = .buttons([UIButton]())
+        
         self.defaultTheme = defaultTheme
+        
         self.image = image
-        self.cornerRadius = cornerRadius
+
+        self.buttonsStyle = buttonsStyle
+        
+        self.labelsStyle = labelsStyle
+        
+        self.viewBackgoundColor = viewBackgoundColor
     }
 }
 
+public extension UIButton{
+    internal func setButtonFromStyle(buttonStyle: StylesValues.ButtonsStyles){
+        self.layer.borderWidth = buttonStyle.values.borderWidth
+        
+        self.setTitleColor(buttonStyle.values.textColor, for: .normal)
+        
+        self.backgroundColor = buttonStyle.values.backgroundColor
+        
+        self.layer.cornerRadius = buttonStyle.values.cornerRadius
+        
+        self.titleLabel?.font = UIFont.boldSystemFont(ofSize: (buttonStyle.values.fontSize))
+        
+        self.frame.size = CGSize(width: buttonStyle.values.wihth, height: buttonStyle.values.height)
+    }
+}
 
-
-
+public extension UILabel{
+    internal func setLabelFromStyle(labelStyle: StylesValues.LabelsStyles){
+        self.font = UIFont.boldSystemFont(ofSize: (labelStyle.fontSize.rawValue))
+        
+        self.textColor = labelStyle.textColor.value
+        
+        self.backgroundColor = labelStyle.backgroundColor.value
+    }
+}
 
 
 
